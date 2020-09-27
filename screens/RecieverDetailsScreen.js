@@ -10,6 +10,7 @@ export default class RecieverDetailsScreen extends Component{
     super(props);
     this.state={
       userId          : firebase.auth().currentUser.email,
+      userName        :'',
       recieverId      : this.props.navigation.getParam('details')["user_id"],
       requestId       : this.props.navigation.getParam('details')["request_id"],
       bookName        : this.props.navigation.getParam('details')["book_name"],
@@ -49,6 +50,19 @@ updateBookStatus=()=>{
     requested_by        : this.state.recieverName,
     donor_id            : this.state.userId,
     request_status      :  "Donor Interested"
+  })
+}
+
+addNotification = ()=>{
+  var message = this.state.userName + "Has shown interest in donating book"
+  db.collection('all_notifications').add({
+    "targeted_user_id" : this.state.recieverId,
+    "donor_id" : this.state.userId,
+    "request_id" : this.state.requestId,
+    "book_name" : this.state.bookName,
+    "date" : firebase.firestore.FieldValue.serverTimestamp,
+    "notification_status" : "unread",
+    "message" : message
   })
 }
 
@@ -106,6 +120,7 @@ componentDidMount(){
                   style={styles.button}
                   onPress={()=>{
                     this.updateBookStatus()
+                    this.addNotification()
                     this.props.navigation.navigate('MyDonations')
                   }}>
                 <Text>I want to Donate</Text>
